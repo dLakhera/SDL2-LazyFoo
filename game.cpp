@@ -10,12 +10,14 @@ const int SCREEN_HEIGHT = 480;
 
 bool init();
 void close();
-bool loadMedia(std::vector<std::string>);
+bool loadMediaBMP(std::vector<std::string>);
+bool loadMediaPNG(std::string);
 
 SDL_Window *gWindow = NULL;
 SDL_Surface *gScreenSurface = NULL;
 SDL_Renderer *renderer = NULL;
 SDL_Surface *gCurrentSurface = NULL;
+SDL_Surface *gPNGImage = NULL;
 std::vector<SDL_Surface *> gRectSurface;
 
 enum KeyPressSurfaces
@@ -48,12 +50,13 @@ int main(int argc, char *argv[])
     stretchRect.w = SCREEN_WIDTH;
     stretchRect.h = SCREEN_HEIGHT;
 
-    if (!loadMedia(str))
+    if (!loadMediaBMP(str))
     {
         std::cout << "Could not load media!\nError: " << SDL_GetError() << std::endl;
     }
     SDL_bool done = SDL_FALSE;
-    gCurrentSurface = gRectSurface[KEY_PRESS_DEFAULT];
+    loadMediaPNG("img/loaded.png");
+    gCurrentSurface = gPNGImage;
     SDL_BlitSurface(gCurrentSurface, NULL, gScreenSurface, &stretchRect);
     while (!done)
     {
@@ -92,7 +95,8 @@ int main(int argc, char *argv[])
             break;
             default:
             {
-                gCurrentSurface = gRectSurface[KEY_PRESS_DEFAULT];
+                // gCurrentSurface = gRectSurface[KEY_PRESS_DEFAULT];
+                gCurrentSurface = gPNGImage;
             }
             break;
             }
@@ -140,7 +144,30 @@ bool init()
     return success;
 }
 
-bool loadMedia(std::vector<std::string> str)
+bool loadMediaPNG(std::string str)
+{
+    bool success = true;
+    SDL_Surface *gPngImage = IMG_Load(str.c_str());
+    if (gPngImage == NULL)
+    {
+        std::cout << "Image didn\'t load\nError: " << IMG_GetError() << std::endl;
+        success = false;
+        return success;
+    }
+
+    gPNGImage = SDL_ConvertSurface(gPngImage, gScreenSurface->format, 0);
+    if (gPNGImage == NULL)
+    {
+        printf("Unable to optimize image %s! SDL Error: %s\n", str.c_str(), SDL_GetError());
+        success = false;
+        return success;
+    }
+
+    SDL_FreeSurface(gPngImage);
+    return success;
+}
+
+bool loadMediaBMP(std::vector<std::string> str)
 {
     bool success = true;
     for (int i = 0; i < str.size(); i++)
