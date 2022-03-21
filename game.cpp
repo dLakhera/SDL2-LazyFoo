@@ -16,6 +16,7 @@ bool loadPngAsTexture_(std::vector<std::string>);
 SDL_Texture *loadPngAsTexture(std::string);
 
 
+
 SDL_Window *gWindow = NULL;
 // SDL_Surface *gScreenSurface = NULL;
 SDL_Renderer *renderer = NULL;
