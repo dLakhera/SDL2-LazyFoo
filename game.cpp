@@ -91,7 +91,10 @@ int main(int argc, char *argv[])
     }
 
     bool quit = true;
-
+    SDL_Rect topLeftViewport = {0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
+    SDL_Rect topRightViewport = {SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
+    SDL_Rect bottomHalfViewport = {0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2};
+    SDL_Texture *gTexture = loadMediaAsTexture("img/loaded.png");
     while (quit)
     {
         SDL_Event e;
@@ -103,25 +106,17 @@ int main(int argc, char *argv[])
                 quit = false;
             }
         }
-        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
 
-        SDL_Rect fillRect = {SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
-        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, SDL_ALPHA_OPAQUE);
-        SDL_RenderFillRect(gRenderer, &fillRect);
+        SDL_RenderSetViewport(gRenderer, &topLeftViewport);
+        SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
 
-        SDL_Rect outlineRect = {SCREEN_WIDTH / 6, SCREEN_HEIGHT / 6, SCREEN_WIDTH * 2 / 3, SCREEN_HEIGHT * 2 / 3};
-        SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
-        SDL_RenderDrawRect(gRenderer, &outlineRect);
+        SDL_RenderSetViewport(gRenderer, &topRightViewport);
+        SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
 
-        SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
-        SDL_RenderDrawLine(gRenderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2);
-
-        SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
-        for (int i = 0; i < SCREEN_WIDTH; i += 10)
-        {
-            SDL_RenderDrawPoint(gRenderer, i, SCREEN_HEIGHT/2);
-        }
+        SDL_RenderSetViewport(gRenderer, &bottomHalfViewport);
+        SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
 
         SDL_RenderPresent(gRenderer);
     }
