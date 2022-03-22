@@ -10,7 +10,6 @@ const int SCREEN_HEIGHT = 480;
 bool init();
 void close();
 bool loadMedia(std::string);
-std::vector<SDL_Rect> gSprites(4);
 SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
 
@@ -21,10 +20,11 @@ public:
     ~LTexture();
 
     void free();
-    void render(int x, int y, SDL_Rect *rec);
+    void render(int x, int y);
     int getWidth();
     int getHeight();
     bool loadFromFile(std::string);
+    void setColor(Uint8 red, Uint8 green, Uint8 blue);
 
 private:
     SDL_Texture *mTexture;
@@ -65,15 +65,9 @@ int LTexture::getWidth()
     return mWidth;
 }
 
-void LTexture::render(int x, int y, SDL_Rect *clip)
+void LTexture::render(int x, int y)
 {
-    SDL_Rect renderQuad = {x, y, mWidth, mHeight};
-    if (clip != NULL)
-    {
-        renderQuad.w = clip->w;
-        renderQuad.h = clip->h;
-    }
-    SDL_RenderCopy(gRenderer, mTexture, clip, &renderQuad);
+    SDL_RenderCopy(gRenderer, mTexture, NULL, NULL);
 }
 
 bool LTexture ::loadFromFile(std::string str)
@@ -87,7 +81,6 @@ bool LTexture ::loadFromFile(std::string str)
         success = false;
         return success;
     }
-    SDL_SetColorKey(gSurface, SDL_TRUE, SDL_MapRGB(gSurface->format, 0, 0xFF, 0xFF));
     SDL_Texture *gTexture = SDL_CreateTextureFromSurface(gRenderer, gSurface);
     if (gTexture == NULL)
     {
@@ -99,6 +92,11 @@ bool LTexture ::loadFromFile(std::string str)
     this->mTexture = gTexture;
     SDL_FreeSurface(gSurface);
     return this->mTexture != NULL;
+}
+
+void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue)
+{
+    SDL_SetTextureColorMod(mTexture, red, green, blue);
 }
 
 LTexture gTexture;
@@ -163,10 +161,6 @@ bool loadMedia(std::string str)
         printf("Failed to load sprite sheet texture!\n");
         success = false;
     }
-    gSprites[0] = {0, 0, 100, 100};
-    gSprites[1] = {0, 100, 100, 100};
-    gSprites[2] = {100, 0, 100, 100};
-    gSprites[3] = {100, 100, 100, 100};
     return success;
 }
 
@@ -179,7 +173,10 @@ int main(int argc, char *argv[])
     }
 
     bool quit = true;
-    loadMedia("img/dots.png") ? quit = true : quit = false;
+    loadMedia("img/colors.png") ? quit = true : quit = false;
+    Uint8 r = 255;
+    Uint8 g = 255;
+    Uint8 b = 255;
     while (quit)
     {
         SDL_Event e;
@@ -189,14 +186,41 @@ int main(int argc, char *argv[])
             {
                 quit = false;
             }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_q:
+                    r += 32;
+                    break;
+
+                case SDLK_w:
+                    g += 32;
+                    break;
+
+                case SDLK_e:
+                    b += 32;
+                    break;
+
+                case SDLK_a:
+                    r -= 32;
+                    break;
+
+                case SDLK_s:
+                    g -= 32;
+                    break;
+
+                case SDLK_d:
+                    b -= 32;
+                    break;
+                }
+            }
         }
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
 
-        gTexture.render(0, 0, &gSprites[0]);
-        gTexture.render(SCREEN_WIDTH - gSprites[1].w, 0, &gSprites[1]);
-        gTexture.render(0, SCREEN_HEIGHT - gSprites[2].h, &gSprites[2]);
-        gTexture.render(SCREEN_WIDTH - gSprites[3].w, SCREEN_HEIGHT - gSprites[3].h, &gSprites[3]);
+        gTexture.setColor(r, g, b);
+        gTexture.render(0, 0);
 
         SDL_RenderPresent(gRenderer);
     }
