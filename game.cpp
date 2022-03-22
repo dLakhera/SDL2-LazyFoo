@@ -12,7 +12,8 @@ void close();
 bool loadMedia(std::string);
 SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
-
+const int WALKING_ANIMATION_FRAMES = 4;
+std::vector<SDL_Rect> gSprites(WALKING_ANIMATION_FRAMES);
 class LTexture
 {
 public:
@@ -27,7 +28,7 @@ public:
     void setColor(Uint8 red, Uint8 green, Uint8 blue);
     void setBlendMode(SDL_BlendMode blending);
     void setAlpha(Uint8 alpha);
-    void render(int x, int y);
+    void render(int x, int y, SDL_Rect* clip = NULL);
 
 private:
     SDL_Texture *mTexture;
@@ -68,9 +69,10 @@ int LTexture::getWidth()
     return mWidth;
 }
 
-void LTexture::render(int x, int y)
+void LTexture::render(int x, int y, SDL_Rect* clip)
 {
-    SDL_RenderCopy(gRenderer, mTexture, NULL, NULL);
+    SDL_Rect renderQuad = {x,y,64,205};
+    SDL_RenderCopy(gRenderer, mTexture, clip, &renderQuad);
 }
 
 bool LTexture ::loadFromFile(std::string str)
@@ -84,6 +86,7 @@ bool LTexture ::loadFromFile(std::string str)
         success = false;
         return success;
     }
+    SDL_SetColorKey(gSurface, SDL_TRUE, SDL_MapRGB(gSurface->format, 0, 0xFF, 0xFF));
     SDL_Texture *gTexture = SDL_CreateTextureFromSurface(gRenderer, gSurface);
     if (gTexture == NULL)
     {
@@ -105,7 +108,6 @@ void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue)
 void LTexture::setAlpha(Uint8 alpha){
     SDL_SetTextureAlphaMod( this->mTexture, alpha );
 }
-
 
 void LTexture::setBlendMode(SDL_BlendMode blending){
     SDL_SetTextureBlendMode(this->mTexture, blending);
@@ -163,22 +165,19 @@ void close()
     SDL_Quit();
 }
 
-bool loadMedia(std::vector<std::string> str)
+bool loadMedia(std::string str)
 {
     bool success = true;
-    if (!gTexture.loadFromFile(str[0]))
-    {
-        printf("Failed to load sprite sheet texture!\n");
-        success = false;
-    }
-    gTexture.setBlendMode(SDL_BLENDMODE_BLEND);
-
-    if (!gBackground.loadFromFile(str[1]))
+    if (!gTexture.loadFromFile(str.c_str()))
     {
         printf("Failed to load sprite sheet texture!\n");
         success = false;
     }
 
+    gSprites[0] = {0, 0, 64, 205};
+    gSprites[1] = {64,0,64,205};
+    gSprites[2] = {128,0,64,205};
+    gSprites[3] = {192, 0, 64, 205};
     return success;
 }
 
@@ -189,11 +188,9 @@ int main(int argc, char *argv[])
     {
         return 0;
     }
-    std::vector<std::string> str({"img/fadeout.png", "img/fadein.png"});
     bool quit = true;
-    // loadMedia("img/colors.png") ? quit = true : quit = false;
-    loadMedia(str);
-    Uint8 a = 255;
+    loadMedia("img/stickman.png");
+    int frames = 0;
     while (quit)
     {
         SDL_Event e;
@@ -203,28 +200,16 @@ int main(int argc, char *argv[])
             {
                 quit = false;
             }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_w:
-                    a+32 > 255 ? a = 255 : a+=32;
-                    break;
-                case SDLK_s:
-                    a > 32 ? a-=32 : a = 0;
-                    break;
-                }
-            }
         }
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
 
-        gBackground.render(0, 0);
-
-        gTexture.setAlpha(a);
-        gTexture.render(0, 0);
-
+        gTexture.render((SCREEN_WIDTH - gTexture.getWidth()) / 2, (SCREEN_HEIGHT - gTexture.getHeight()) / 2, &gSprites[frames/4]);
         SDL_RenderPresent(gRenderer);
+        frames++;
+        if(frames/4 >= WALKING_ANIMATION_FRAMES) {
+            frames = 0;
+        }
     }
 
     close();
