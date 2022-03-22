@@ -20,17 +20,20 @@ public:
     ~LTexture();
 
     void free();
-    void render(int x, int y);
+    // void render(int x, int y);
     int getWidth();
     int getHeight();
     bool loadFromFile(std::string);
     void setColor(Uint8 red, Uint8 green, Uint8 blue);
+    void setBlendMode(SDL_BlendMode blending);
+    void setAlpha(Uint8 alpha);
+    void render(int x, int y);
 
 private:
     SDL_Texture *mTexture;
     int mWidth;
     int mHeight;
-};
+} gTexture, gBackground;
 
 LTexture::LTexture()
 {
@@ -99,7 +102,14 @@ void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue)
     SDL_SetTextureColorMod(mTexture, red, green, blue);
 }
 
-LTexture gTexture;
+void LTexture::setAlpha(Uint8 alpha){
+    SDL_SetTextureAlphaMod( this->mTexture, alpha );
+}
+
+
+void LTexture::setBlendMode(SDL_BlendMode blending){
+    SDL_SetTextureBlendMode(this->mTexture, blending);
+}
 
 bool init()
 {
@@ -153,14 +163,22 @@ void close()
     SDL_Quit();
 }
 
-bool loadMedia(std::string str)
+bool loadMedia(std::vector<std::string> str)
 {
     bool success = true;
-    if (!gTexture.loadFromFile(str))
+    if (!gTexture.loadFromFile(str[0]))
     {
         printf("Failed to load sprite sheet texture!\n");
         success = false;
     }
+    gTexture.setBlendMode(SDL_BLENDMODE_BLEND);
+
+    if (!gBackground.loadFromFile(str[1]))
+    {
+        printf("Failed to load sprite sheet texture!\n");
+        success = false;
+    }
+
     return success;
 }
 
@@ -171,12 +189,11 @@ int main(int argc, char *argv[])
     {
         return 0;
     }
-
+    std::vector<std::string> str({"img/fadeout.png", "img/fadein.png"});
     bool quit = true;
-    loadMedia("img/colors.png") ? quit = true : quit = false;
-    Uint8 r = 255;
-    Uint8 g = 255;
-    Uint8 b = 255;
+    // loadMedia("img/colors.png") ? quit = true : quit = false;
+    loadMedia(str);
+    Uint8 a = 255;
     while (quit)
     {
         SDL_Event e;
@@ -190,28 +207,11 @@ int main(int argc, char *argv[])
             {
                 switch (e.key.keysym.sym)
                 {
-                case SDLK_q:
-                    r += 32;
-                    break;
-
                 case SDLK_w:
-                    g += 32;
+                    a+32 > 255 ? a = 255 : a+=32;
                     break;
-
-                case SDLK_e:
-                    b += 32;
-                    break;
-
-                case SDLK_a:
-                    r -= 32;
-                    break;
-
                 case SDLK_s:
-                    g -= 32;
-                    break;
-
-                case SDLK_d:
-                    b -= 32;
+                    a > 32 ? a-=32 : a = 0;
                     break;
                 }
             }
@@ -219,7 +219,9 @@ int main(int argc, char *argv[])
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
 
-        gTexture.setColor(r, g, b);
+        gBackground.render(0, 0);
+
+        gTexture.setAlpha(a);
         gTexture.render(0, 0);
 
         SDL_RenderPresent(gRenderer);
