@@ -2,27 +2,31 @@
 #include <SDL_image.h>
 #include <iostream>
 #include <string>
+#include <vector>
 #include <cmath>
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 bool init();
 void close();
+bool loadMedia(std::string);
+std::vector<SDL_Rect> gSprites(4);
 SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
 
-class LTexture {
+class LTexture
+{
 public:
     LTexture();
     ~LTexture();
 
     void free();
-    void render(int x, int y);
+    void render(int x, int y, SDL_Rect *rec);
     int getWidth();
     int getHeight();
     bool loadFromFile(std::string);
 
-private : 
+private:
     SDL_Texture *mTexture;
     int mWidth;
     int mHeight;
@@ -40,7 +44,8 @@ LTexture::~LTexture()
     free();
 }
 
-void LTexture::free() {
+void LTexture::free()
+{
     if (mTexture != NULL)
     {
         SDL_DestroyTexture(mTexture);
@@ -50,7 +55,8 @@ void LTexture::free() {
     }
 }
 
-int LTexture::getHeight() {
+int LTexture::getHeight()
+{
     return mHeight;
 }
 
@@ -59,10 +65,15 @@ int LTexture::getWidth()
     return mWidth;
 }
 
-void LTexture::render(int x, int y)
+void LTexture::render(int x, int y, SDL_Rect *clip)
 {
     SDL_Rect renderQuad = {x, y, mWidth, mHeight};
-    SDL_RenderCopy(gRenderer, mTexture, NULL, &renderQuad);
+    if (clip != NULL)
+    {
+        renderQuad.w = clip->w;
+        renderQuad.h = clip->h;
+    }
+    SDL_RenderCopy(gRenderer, mTexture, clip, &renderQuad);
 }
 
 bool LTexture ::loadFromFile(std::string str)
@@ -85,13 +96,12 @@ bool LTexture ::loadFromFile(std::string str)
     }
     this->mWidth = gSurface->w;
     this->mHeight = gSurface->h;
-    SDL_FreeSurface(gSurface);
     this->mTexture = gTexture;
+    SDL_FreeSurface(gSurface);
     return this->mTexture != NULL;
 }
 
 LTexture gTexture;
-LTexture gBackground;
 
 bool init()
 {
@@ -129,24 +139,35 @@ bool init()
             }
         }
     }
-
     return success;
 }
 
 void close()
 {
     gTexture.free();
-    gBackground.free();
 
-    // Destroy window
     SDL_DestroyRenderer(gRenderer);
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
     gRenderer = NULL;
 
-    // Quit SDL subsystems
     IMG_Quit();
     SDL_Quit();
+}
+
+bool loadMedia(std::string str)
+{
+    bool success = true;
+    if (!gTexture.loadFromFile(str))
+    {
+        printf("Failed to load sprite sheet texture!\n");
+        success = false;
+    }
+    gSprites[0] = {0, 0, 100, 100};
+    gSprites[1] = {0, 100, 100, 100};
+    gSprites[2] = {100, 0, 100, 100};
+    gSprites[3] = {100, 100, 100, 100};
+    return success;
 }
 
 int main(int argc, char *argv[])
@@ -158,15 +179,7 @@ int main(int argc, char *argv[])
     }
 
     bool quit = true;
-    if(!gTexture.loadFromFile("img/guy.png")){
-        printf("Texture could not be created! SDL Error: %s\n", SDL_GetError());
-        return 0;
-    }
-    if (!gBackground.loadFromFile("img/bg.png"))
-    {
-        printf("Texture could not be created! SDL Error: %s\n", SDL_GetError());
-        return 0;
-    }
+    loadMedia("img/dots.png") ? quit = true : quit = false;
     while (quit)
     {
         SDL_Event e;
@@ -180,8 +193,10 @@ int main(int argc, char *argv[])
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
 
-        gBackground.render(0, 0);
-        gTexture.render(240, 190);
+        gTexture.render(0, 0, &gSprites[0]);
+        gTexture.render(SCREEN_WIDTH - gSprites[1].w, 0, &gSprites[1]);
+        gTexture.render(0, SCREEN_HEIGHT - gSprites[2].h, &gSprites[2]);
+        gTexture.render(SCREEN_WIDTH - gSprites[3].w, SCREEN_HEIGHT - gSprites[3].h, &gSprites[3]);
 
         SDL_RenderPresent(gRenderer);
     }
