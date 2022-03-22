@@ -43,7 +43,7 @@ bool init()
     return success;
 }
 
-bool loadMedia(const std::string str, LTexture &gTexture, std::vector<SDL_Rect> &gSprites)
+bool loadMedia(const std::string str, LTexture &gTexture)
 {
     bool success = true;
     if (!gTexture.loadFromFile(str.c_str()))
@@ -51,11 +51,6 @@ bool loadMedia(const std::string str, LTexture &gTexture, std::vector<SDL_Rect> 
         printf("Failed to load sprite sheet texture!\n");
         success = false;
     }
-
-    gSprites[0] = {0, 0, 64, 205};
-    gSprites[1] = {64, 0, 64, 205};
-    gSprites[2] = {128, 0, 64, 205};
-    gSprites[3] = {192, 0, 64, 205};
     return success;
 }
 

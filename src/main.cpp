@@ -17,9 +17,9 @@ int main(int argc, char *argv[])
         return 0;
     }
     bool quit = true;
-    std::vector<SDL_Rect> gSprites(WALKING_ANIMATION_FRAMES);
-    loadMedia("img/stickman.png", gTexture, gSprites);
-    int frames = 0;
+    loadMedia("img/arrow.png", gTexture);
+    double degrees = 0.0;
+    SDL_RendererFlip flipType = SDL_FLIP_NONE;
     while (quit)
     {
         SDL_Event e;
@@ -29,16 +29,38 @@ int main(int argc, char *argv[])
             {
                 quit = false;
             }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_a:
+                    degrees -= 60;
+                    break;
+
+                case SDLK_d:
+                    degrees += 60;
+                    break;
+
+                case SDLK_q:
+                    flipType = SDL_FLIP_HORIZONTAL;
+                    break;
+
+                case SDLK_w:
+                    flipType = SDL_FLIP_NONE;
+                    break;
+
+                case SDLK_e:
+                    flipType = SDL_FLIP_VERTICAL;
+                    break;
+                }
+            }
         }
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
 
-        gTexture.render((SCREEN_WIDTH - gTexture.getWidth()) / 2, (SCREEN_HEIGHT - gTexture.getHeight()) / 2, &gSprites[frames/4]);
+        gTexture.render((SCREEN_WIDTH - gTexture.getWidth()) / 2, (SCREEN_HEIGHT - gTexture.getHeight()) / 2, NULL, degrees, NULL, flipType);
+
         SDL_RenderPresent(gRenderer);
-        frames++;
-        if(frames/4 >= WALKING_ANIMATION_FRAMES) {
-            frames = 0;
-        }
     }
 
     close();

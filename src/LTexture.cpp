@@ -33,10 +33,15 @@ int LTexture::getWidth()
     return mWidth;
 }
 
-void LTexture::render(int x, int y, SDL_Rect *clip)
+void LTexture::render(int x, int y, SDL_Rect *clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
-    SDL_Rect renderQuad = {x, y, 64, 205};
-    SDL_RenderCopy(gRenderer, mTexture, clip, &renderQuad);
+    SDL_Rect renderQuad = {x, y, mWidth, mHeight};
+    if (clip != NULL)
+    {
+        renderQuad.w = clip->w;
+        renderQuad.h = clip->h;
+    }
+    SDL_RenderCopyEx(gRenderer, mTexture, clip, &renderQuad, angle, center, flip);
 }
 
 bool LTexture::loadFromFile(std::string str)
