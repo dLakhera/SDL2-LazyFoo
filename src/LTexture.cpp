@@ -1,5 +1,6 @@
 #include "include/global.h"
 
+TTF_Font* gFont = NULL;
 LTexture::LTexture()
 {
     mTexture = NULL;
@@ -82,4 +83,30 @@ void LTexture::setAlpha(Uint8 alpha)
 void LTexture::setBlendMode(SDL_BlendMode blending)
 {
     SDL_SetTextureBlendMode(this->mTexture, blending);
+}
+
+bool LTexture::loadFromRenderedText(std::string text, SDL_Color textColor) 
+{
+    free();
+    bool success = true;
+    SDL_Surface *gSurface = TTF_RenderText_Solid(gFont, text.c_str(), textColor);
+    if (gSurface == NULL)
+    {
+        printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+        return !success;
+    }
+
+    mTexture = SDL_CreateTextureFromSurface(gRenderer, gSurface);
+    if (mTexture == NULL)
+    {
+        printf("Unable to render text texture! SDL_ttf Error: %s\n", TTF_GetError());
+        return !success;
+    }
+    else
+    {
+        mWidth = gSurface->w;
+        mHeight = gSurface->h;
+    }
+    SDL_FreeSurface(gSurface);
+    return success;
 }
