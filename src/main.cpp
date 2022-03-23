@@ -39,14 +39,13 @@ int main(int argc, char *argv[])
             {
                 gButtons[i].handleEvent(&e);
             }
-        }
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
 
-        for (int i = 0; i < TOTAL_BUTTONS; ++i)
         {
             gButtons[i].render();
         }
+        gTexture.render((SCREEN_WIDTH - gTexture.getWidth()) / 2, (SCREEN_HEIGHT - gTexture.getHeight()) / 2);
         SDL_RenderPresent(gRenderer);
     }
 
