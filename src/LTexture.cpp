@@ -50,7 +50,7 @@ bool LTexture::loadFromFile(std::string str)
     free();
     bool success = true;
     SDL_Surface *gSurface = IMG_Load(str.c_str());
-    if (gWindow == NULL)
+    if (gSurface == NULL)
     {
         printf("Surface could not be created! SDL Error: %s\n", SDL_GetError());
         success = false;

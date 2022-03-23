@@ -37,11 +37,6 @@ bool init(/* std::vector<SDL_Rect> &gButtonOnSprite */)
                     printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
                     success = false;
                 }
-                if (TTF_Init() == -1)
-                {
-                    printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
-                    success = false;
-                }
             }
         }
     }
@@ -55,16 +50,7 @@ bool init(/* std::vector<SDL_Rect> &gButtonOnSprite */)
 bool loadMedia(const std::string str, LTexture &gTexture)
 {
     bool success = true;
-    gFont = TTF_OpenFont(str.c_str(), 28);
-    if (gFont == NULL)
-    {
-        printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
-        success = false;
-        return success;
-    }
-
-    SDL_Color textColor = {0, 0, 0};
-    if (!gTexture.loadFromRenderedText("The quick brown fox jumps over the lazy dog", textColor))
+    if (!gTexture.loadFromFile(str.c_str()))
     {
         printf("Failed to render text texture!\n");
         success = false;
@@ -80,15 +66,11 @@ void close()
 {
     gTexture.free();
 
-    TTF_CloseFont(gFont);
-    gFont = NULL;
-
     SDL_DestroyRenderer(gRenderer);
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
     gRenderer = NULL;
-
-    TTF_Quit();
+    
     IMG_Quit();
     SDL_Quit();
 }
