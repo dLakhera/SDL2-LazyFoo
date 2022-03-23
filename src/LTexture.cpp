@@ -34,15 +34,15 @@ int LTexture::getWidth()
     return mWidth;
 }
 
-void LTexture::render(int x, int y, SDL_Rect *clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
+void LTexture::render(int x, int y, SDL_Rect *clip)
 {
-    SDL_Rect renderQuad = {x, y, mWidth, mHeight};
-    if (clip != NULL)
-    {
+    SDL_Rect renderQuad = {x,y,mWidth, mHeight};
+
+    if(clip != NULL) {
         renderQuad.w = clip->w;
         renderQuad.h = clip->h;
     }
-    SDL_RenderCopyEx(gRenderer, mTexture, clip, &renderQuad, angle, center, flip);
+    SDL_RenderCopy(gRenderer, mTexture, clip, &renderQuad);
 }
 
 bool LTexture::loadFromFile(std::string str)
@@ -56,7 +56,6 @@ bool LTexture::loadFromFile(std::string str)
         success = false;
         return success;
     }
-    SDL_SetColorKey(gSurface, SDL_TRUE, SDL_MapRGB(gSurface->format, 0, 0xFF, 0xFF));
     SDL_Texture *gTexture = SDL_CreateTextureFromSurface(gRenderer, gSurface);
     if (gTexture == NULL)
     {

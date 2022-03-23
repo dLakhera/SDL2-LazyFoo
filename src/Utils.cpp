@@ -4,7 +4,7 @@
 SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
 
-bool init()
+bool init(/* std::vector<SDL_Rect> &gButtonOnSprite */)
 {
     bool success = true;
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -45,26 +45,25 @@ bool init()
             }
         }
     }
+    gButtonOnSprite[0] = {0, 0, 200, 300};
+    gButtonOnSprite[1] = {0, 200, 200, 300};
+    gButtonOnSprite[2] = {0, 400, 200, 300};
+    gButtonOnSprite[3] = {0, 600, 200, 300};
     return success;
 }
 
 bool loadMedia(const std::string str, LTexture &gTexture)
 {
     bool success = true;
-    gFont = TTF_OpenFont(str.c_str(), 28);
-    if (gFont == NULL)
-    {
-        printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
-        success = false;
-        return success;
-    }
-
-    SDL_Color textColor = {0, 0, 0};
-    if (!gTexture.loadFromRenderedText("The quick brown fox jumps over the lazy dog", textColor))
+    if (!gTexture.loadFromFile(str.c_str()))
     {
         printf("Failed to render text texture!\n");
         success = false;
     }
+    gButtons[0].setPosition(0, 0);
+    gButtons[1].setPosition(SCREEN_WIDTH - BUTTON_WIDTH, 0);
+    gButtons[2].setPosition(0, SCREEN_HEIGHT - BUTTON_HEIGHT);
+    gButtons[3].setPosition(SCREEN_WIDTH - BUTTON_WIDTH, SCREEN_HEIGHT - BUTTON_HEIGHT);
     return success;
 }
 
@@ -72,15 +71,11 @@ void close()
 {
     gTexture.free();
 
-    TTF_CloseFont(gFont);
-    gFont = NULL;
-
     SDL_DestroyRenderer(gRenderer);
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
     gRenderer = NULL;
 
-    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
 }
