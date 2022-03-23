@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
         return 0;
     }
     bool quit = true;
-    loadMedia("img/arrow.png", gTexture);
+    loadMedia("/Users/droidlakhera/Desktop/Projects/sdl2/kMag/res/fonts/lazy.ttf", gTexture);
     double degrees = 0.0;
     SDL_RendererFlip flipType = SDL_FLIP_NONE;
     while (quit)
@@ -29,37 +29,11 @@ int main(int argc, char *argv[])
             {
                 quit = false;
             }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_a:
-                    degrees -= 60;
-                    break;
-
-                case SDLK_d:
-                    degrees += 60;
-                    break;
-
-                case SDLK_q:
-                    flipType = SDL_FLIP_HORIZONTAL;
-                    break;
-
-                case SDLK_w:
-                    flipType = SDL_FLIP_NONE;
-                    break;
-
-                case SDLK_e:
-                    flipType = SDL_FLIP_VERTICAL;
-                    break;
-                }
-            }
         }
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
 
-        gTexture.render((SCREEN_WIDTH - gTexture.getWidth()) / 2, (SCREEN_HEIGHT - gTexture.getHeight()) / 2, NULL, degrees, NULL, flipType);
-
+        gTexture.render((SCREEN_WIDTH - gTexture.getWidth()) / 2, (SCREEN_HEIGHT - gTexture.getHeight()) / 2);
         SDL_RenderPresent(gRenderer);
     }
 
