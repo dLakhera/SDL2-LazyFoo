@@ -1,10 +1,13 @@
 #include "include/Utils.h"
 #include "include/global.h"
+#include "include/models.h"
+#include <iostream>
 
 SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
+std::vector<LTexture> gKButtons;
 
-bool init(/* std::vector<SDL_Rect> &gButtonOnSprite */)
+bool Utils::init()
 {
     bool success = true;
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -40,6 +43,7 @@ bool init(/* std::vector<SDL_Rect> &gButtonOnSprite */)
             }
         }
     }
+    gButtonOnSprite.resize(4);
     gButtonOnSprite[0] = {0, 0, 200, 300};
     gButtonOnSprite[1] = {0, 200, 200, 300};
     gButtonOnSprite[2] = {0, 400, 200, 300};
@@ -47,7 +51,24 @@ bool init(/* std::vector<SDL_Rect> &gButtonOnSprite */)
     return success;
 }
 
-bool loadMedia(const std::string str, LTexture &gTexture)
+bool Utils::loadMedia(std::vector<std::string> &str)
+{
+    gKButtons.clear();
+    gKButtons.resize(str.size(), LTexture());
+    bool success = true;
+   
+    for (int i = 0; i < str.size(); i++)
+    {
+        if (!gKButtons[i].loadFromFile(str[i]))
+        {
+            printf("Failed to render text texture!\n");
+            success = false;
+        }
+    }
+    return success;
+}
+
+bool Utils::loadMedia(const std::string str, LTexture &gTexture)
 {
     bool success = true;
     if (!gTexture.loadFromFile(str.c_str()))
@@ -62,7 +83,7 @@ bool loadMedia(const std::string str, LTexture &gTexture)
     return success;
 }
 
-void close()
+void Utils::close()
 {
     gTexture.free();
 
@@ -70,7 +91,32 @@ void close()
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
     gRenderer = NULL;
-    
+
     IMG_Quit();
     SDL_Quit();
+}
+
+KButton Utils::handleEvent(/* SDL_Event *e */)
+{
+    KButton currentTexture = BUTTON_SPRITE_DEFAULT;
+    const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
+
+    if (currentKeyStates[SDL_SCANCODE_UP])
+    {
+        currentTexture = BUTTON_SPRITE_UP;
+    }
+    else if (currentKeyStates[SDL_SCANCODE_DOWN])
+    {
+        currentTexture = BUTTON_SPRITE_DOWN;
+    }
+    else if (currentKeyStates[SDL_SCANCODE_LEFT])
+    {
+        currentTexture = BUTTON_SPRITE_LEFT;
+    }
+    else if (currentKeyStates[SDL_SCANCODE_RIGHT])
+    {
+        currentTexture = BUTTON_SPRITE_RIGHT;
+    }
+    
+    return currentTexture;
 }

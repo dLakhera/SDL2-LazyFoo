@@ -1,11 +1,13 @@
 #include "include/global.h"
+#include <iostream>
+TTF_Font *gFont = NULL;
 
-TTF_Font* gFont = NULL;
 LTexture::LTexture()
 {
     mTexture = NULL;
     mWidth = 0;
     mHeight = 0;
+    mTexName = "default name";
 }
 
 LTexture::~LTexture()
@@ -36,36 +38,44 @@ int LTexture::getWidth()
 
 void LTexture::render(int x, int y, SDL_Rect *clip)
 {
-    SDL_Rect renderQuad = {x,y,mWidth, mHeight};
+    SDL_Rect renderQuad = {x, y, mWidth, mHeight};
 
-    if(clip != NULL) {
+    if (clip != NULL)
+    {
         renderQuad.w = clip->w;
         renderQuad.h = clip->h;
     }
     SDL_RenderCopy(gRenderer, mTexture, clip, &renderQuad);
 }
 
+void LTexture::render()
+{
+    SDL_RenderCopy(gRenderer, this->mTexture, NULL, NULL);
+}
+
 bool LTexture::loadFromFile(std::string str)
 {
     free();
     bool success = true;
-    SDL_Surface *gSurface = IMG_Load(str.c_str());
-    if (gSurface == NULL)
+    SDL_Surface *lSurface = IMG_Load(str.c_str());
+    if (lSurface == NULL)
     {
         printf("Surface could not be created! SDL Error: %s\n", SDL_GetError());
         success = false;
         return success;
     }
-    SDL_Texture *gTexture = SDL_CreateTextureFromSurface(gRenderer, gSurface);
-    if (gTexture == NULL)
+    SDL_Texture *lTexture = SDL_CreateTextureFromSurface(gRenderer, lSurface);
+    if (lTexture == NULL)
     {
         printf("Texture could not be created! SDL Error: %s\n", SDL_GetError());
         return success;
     }
-    this->mWidth = gSurface->w;
-    this->mHeight = gSurface->h;
-    this->mTexture = gTexture;
-    SDL_FreeSurface(gSurface);
+
+    this->mWidth = lSurface->w;
+    this->mHeight = lSurface->h;
+    this->mTexName = str;
+    this->mTexture = lTexture;
+    SDL_FreeSurface(lSurface);
     return this->mTexture != NULL;
 }
 
@@ -84,7 +94,7 @@ void LTexture::setBlendMode(SDL_BlendMode blending)
     SDL_SetTextureBlendMode(this->mTexture, blending);
 }
 
-bool LTexture::loadFromRenderedText(std::string text, SDL_Color textColor) 
+bool LTexture::loadFromRenderedText(std::string text, SDL_Color textColor)
 {
     free();
     bool success = true;
@@ -108,4 +118,8 @@ bool LTexture::loadFromRenderedText(std::string text, SDL_Color textColor)
     }
     SDL_FreeSurface(gSurface);
     return success;
+}
+
+void LTexture::print() {
+    std::cout << mTexName << std::endl;
 }

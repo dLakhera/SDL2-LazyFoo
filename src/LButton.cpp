@@ -2,6 +2,7 @@
 #include "include/LTexture.h"
 #include "include/LButton.h"
 #include "include/global.h"
+#include "include/models.h"
 
 LButton::LButton()
 {
