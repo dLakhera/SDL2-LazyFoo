@@ -14,14 +14,15 @@ public:
     void free();
     int getWidth();
     int getHeight();
-    bool loadFromFile(std::string);
-    bool loadFromRenderedText(std::string text, SDL_Color textColor);
+    void loadFromFile(std::string);
+    void loadFromRenderedText(std::string text, SDL_Color textColor);
     void setColor(Uint8 red, Uint8 green, Uint8 blue);
     void setBlendMode(SDL_BlendMode blending);
     void setAlpha(Uint8 alpha);
     void render(int x, int y, SDL_Rect *clip = NULL);
     void render();
     void print();
+    
 private:
     SDL_Texture *mTexture;
     std::string mTexName;

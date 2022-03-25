@@ -1,7 +1,7 @@
 #include "include/global.h"
 #include <iostream>
-TTF_Font *gFont = NULL;
 
+TTF_Font* gFont = NULL;
 LTexture::LTexture()
 {
     mTexture = NULL;
@@ -53,22 +53,21 @@ void LTexture::render()
     SDL_RenderCopy(gRenderer, this->mTexture, NULL, NULL);
 }
 
-bool LTexture::loadFromFile(std::string str)
+void LTexture::loadFromFile(std::string str)
 {
     free();
-    bool success = true;
+    
     SDL_Surface *lSurface = IMG_Load(str.c_str());
     if (lSurface == NULL)
     {
         printf("Surface could not be created! SDL Error: %s\n", SDL_GetError());
-        success = false;
-        return success;
+        throw "LTexture::loadFromFile surface loading failed!";
     }
     SDL_Texture *lTexture = SDL_CreateTextureFromSurface(gRenderer, lSurface);
     if (lTexture == NULL)
     {
         printf("Texture could not be created! SDL Error: %s\n", SDL_GetError());
-        return success;
+        throw "LTexture::loadFromFile texture loading failed!";
     }
 
     this->mWidth = lSurface->w;
@@ -76,7 +75,9 @@ bool LTexture::loadFromFile(std::string str)
     this->mTexName = str;
     this->mTexture = lTexture;
     SDL_FreeSurface(lSurface);
-    return this->mTexture != NULL;
+    if(mTexture  == NULL) {
+        throw "LTexture::loadFromFile mTexture updation failed!";
+    }
 }
 
 void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue)
@@ -94,22 +95,21 @@ void LTexture::setBlendMode(SDL_BlendMode blending)
     SDL_SetTextureBlendMode(this->mTexture, blending);
 }
 
-bool LTexture::loadFromRenderedText(std::string text, SDL_Color textColor)
+void LTexture::loadFromRenderedText(std::string text, SDL_Color textColor)
 {
     free();
-    bool success = true;
     SDL_Surface *gSurface = TTF_RenderText_Solid(gFont, text.c_str(), textColor);
     if (gSurface == NULL)
     {
         printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
-        return !success;
+        throw "LTexture::loadFromRenderedText font loading failed!";
     }
 
     mTexture = SDL_CreateTextureFromSurface(gRenderer, gSurface);
     if (mTexture == NULL)
     {
         printf("Unable to render text texture! SDL_ttf Error: %s\n", TTF_GetError());
-        return !success;
+        throw "LTexture::loadFromRenderedText texture loading failed!";
     }
     else
     {
@@ -117,7 +117,6 @@ bool LTexture::loadFromRenderedText(std::string text, SDL_Color textColor)
         mHeight = gSurface->h;
     }
     SDL_FreeSurface(gSurface);
-    return success;
 }
 
 void LTexture::print() {

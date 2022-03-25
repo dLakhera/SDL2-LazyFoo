@@ -3,9 +3,10 @@
 #include "models.h"
 
 namespace Utils{
-    bool init();
-    bool loadMedia(const std::string str, LTexture &gTexture);
-    bool loadMedia(std::vector<std::string> &str);
+    void init();
+    void loadMedia(const std::string str, LTexture &gTexture);
+    void loadMedia();
     void close();
+    void update(bool &);
     KButton handleEvent();
 }

@@ -1,19 +1,19 @@
 #include "include/Utils.h"
 #include "include/global.h"
 #include "include/models.h"
+#include "include/constants.h"
 #include <iostream>
 
 SDL_Window *gWindow = NULL;
 SDL_Renderer *gRenderer = NULL;
 std::vector<LTexture> gKButtons;
 
-bool Utils::init()
+void Utils::init()
 {
-    bool success = true;
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
-        success = false;
+        throw "Init failed()!";
     }
     else
     {
@@ -21,7 +21,7 @@ bool Utils::init()
         if (gWindow == NULL)
         {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
-            success = false;
+            throw "Init failed()!";
         }
         else
         {
@@ -29,7 +29,7 @@ bool Utils::init()
             if (gRenderer == NULL)
             {
                 printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
-                success = false;
+                throw "Init failed()!";
             }
             else
             {
@@ -38,49 +38,28 @@ bool Utils::init()
                 if (!(IMG_Init(imgFlags) & imgFlags))
                 {
                     printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
-                    success = false;
+                    throw "Init failed()!";
                 }
             }
         }
     }
-    gButtonOnSprite.resize(4);
-    gButtonOnSprite[0] = {0, 0, 200, 300};
-    gButtonOnSprite[1] = {0, 200, 200, 300};
-    gButtonOnSprite[2] = {0, 400, 200, 300};
-    gButtonOnSprite[3] = {0, 600, 200, 300};
-    return success;
+    loadMedia();
 }
 
-bool Utils::loadMedia(std::vector<std::string> &str)
+void Utils::loadMedia()
 {
     gKButtons.clear();
     gKButtons.resize(str.size(), LTexture());
-    bool success = true;
    
     for (int i = 0; i < str.size(); i++)
     {
-        if (!gKButtons[i].loadFromFile(str[i]))
-        {
-            printf("Failed to render text texture!\n");
-            success = false;
-        }
+        gKButtons[i].loadFromFile(str[i].c_str());
     }
-    return success;
 }
 
-bool Utils::loadMedia(const std::string str, LTexture &gTexture)
+void Utils::loadMedia(const std::string str, LTexture &gTexture)
 {
-    bool success = true;
-    if (!gTexture.loadFromFile(str.c_str()))
-    {
-        printf("Failed to render text texture!\n");
-        success = false;
-    }
-    gButtons[0].setPosition(0, 0);
-    gButtons[1].setPosition(SCREEN_WIDTH - BUTTON_WIDTH, 0);
-    gButtons[2].setPosition(0, SCREEN_HEIGHT - BUTTON_HEIGHT);
-    gButtons[3].setPosition(SCREEN_WIDTH - BUTTON_WIDTH, SCREEN_HEIGHT - BUTTON_HEIGHT);
-    return success;
+    gTexture.loadFromFile(str.c_str());
 }
 
 void Utils::close()
@@ -119,4 +98,21 @@ KButton Utils::handleEvent(/* SDL_Event *e */)
     }
     
     return currentTexture;
+}
+
+void Utils::update(bool &quit){
+    SDL_Event e;
+    KButton currentSprite = BUTTON_SPRITE_DEFAULT;
+    while (SDL_PollEvent(&e) != 0)
+    {
+        if (e.type == SDL_QUIT)
+        {
+            quit = false;
+        }
+    }
+    currentSprite = Utils::handleEvent();
+    SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(gRenderer);
+    gKButtons[currentSprite].render();
+    SDL_RenderPresent(gRenderer);
 }
