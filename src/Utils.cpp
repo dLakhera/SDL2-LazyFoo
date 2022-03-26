@@ -5,10 +5,9 @@
 #include <iostream>
 
 SDL_Window *gWindow = NULL;
-SDL_Renderer *gRenderer = NULL;
 std::vector<LTexture> gKButtons;
 
-void Utils::init()
+void Utils::init(SDL_Renderer* &renderer)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -25,51 +24,40 @@ void Utils::init()
         }
         else
         {
-            gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
-            if (gRenderer == NULL)
+            renderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+            if (renderer == NULL)
             {
                 printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
                 throw "Init failed()!";
             }
-            else
-            {
-                SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
-                int imgFlags = IMG_INIT_PNG;
-                if (!(IMG_Init(imgFlags) & imgFlags))
-                {
-                    printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
-                    throw "Init failed()!";
-                }
-            }
         }
     }
-    loadMedia();
 }
 
-void Utils::loadMedia()
+void Utils::loadMedia(SDL_Renderer* renderer)
 {
     gKButtons.clear();
     gKButtons.resize(str.size(), LTexture());
-   
+
     for (int i = 0; i < str.size(); i++)
     {
-        gKButtons[i].loadFromFile(str[i].c_str());
+        gKButtons[i].loadFromFile(str[i].c_str(), renderer);
     }
 }
 
-void Utils::loadMedia(const std::string str, LTexture &gTexture)
+void Utils::loadMedia(const std::string str, LTexture &gTexture, SDL_Renderer *renderer)
 {
-    gTexture.loadFromFile(str.c_str());
+    gTexture.loadFromFile(str.c_str(), renderer);
 }
 
-void Utils::close()
+void Utils::close(SDL_Renderer *renderer)
 {
     gTexture.free();
 
-    SDL_DestroyRenderer(gRenderer);
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
-    gRenderer = NULL;
+    renderer = NULL;
 
     IMG_Quit();
     SDL_Quit();
@@ -96,11 +84,12 @@ KButton Utils::handleEvent(/* SDL_Event *e */)
     {
         currentTexture = BUTTON_SPRITE_RIGHT;
     }
-    
+
     return currentTexture;
 }
 
-void Utils::update(bool &quit){
+void Utils::update(bool &quit, SDL_Renderer* renderer)
+{
     SDL_Event e;
     KButton currentSprite = BUTTON_SPRITE_DEFAULT;
     while (SDL_PollEvent(&e) != 0)
@@ -111,8 +100,8 @@ void Utils::update(bool &quit){
         }
     }
     currentSprite = Utils::handleEvent();
-    SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderClear(gRenderer);
-    gKButtons[currentSprite].render();
-    SDL_RenderPresent(gRenderer);
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(renderer);
+    gKButtons[currentSprite].render(renderer);
+    SDL_RenderPresent(renderer);
 }

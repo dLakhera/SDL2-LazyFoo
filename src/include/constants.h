@@ -9,7 +9,7 @@ const std::vector<std::string> str = {
     "/Users/droidlakhera/Desktop/Projects/sdl2/kMag/res/img/right.png",
     "/Users/droidlakhera/Desktop/Projects/sdl2/kMag/res/img/default.png",
 };
-
+const std::string dotBMPFilePath = "/Users/droidlakhera/Desktop/Projects/sdl2/kMag/res/img/dot.bmp"; 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int BUTTON_WIDTH = 300;

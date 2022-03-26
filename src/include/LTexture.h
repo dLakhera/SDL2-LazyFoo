@@ -14,13 +14,13 @@ public:
     void free();
     int getWidth();
     int getHeight();
-    void loadFromFile(std::string);
-    void loadFromRenderedText(std::string text, SDL_Color textColor);
+    void loadFromFile(std::string, SDL_Renderer* renderer);
+    void loadFromRenderedText(std::string text, SDL_Color textColor, SDL_Renderer *renderer);
     void setColor(Uint8 red, Uint8 green, Uint8 blue);
     void setBlendMode(SDL_BlendMode blending);
     void setAlpha(Uint8 alpha);
-    void render(int x, int y, SDL_Rect *clip = NULL);
-    void render();
+    void render(int x, int y, SDL_Rect *clip = NULL, SDL_Renderer *renderer = NULL);
+    void render(SDL_Renderer *);
     void print();
     
 private:

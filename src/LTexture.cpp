@@ -36,7 +36,7 @@ int LTexture::getWidth()
     return mWidth;
 }
 
-void LTexture::render(int x, int y, SDL_Rect *clip)
+void LTexture::render(int x, int y, SDL_Rect *clip, SDL_Renderer* renderer)
 {
     SDL_Rect renderQuad = {x, y, mWidth, mHeight};
 
@@ -45,15 +45,15 @@ void LTexture::render(int x, int y, SDL_Rect *clip)
         renderQuad.w = clip->w;
         renderQuad.h = clip->h;
     }
-    SDL_RenderCopy(gRenderer, mTexture, clip, &renderQuad);
+    SDL_RenderCopy(renderer, mTexture, clip, &renderQuad);
 }
 
-void LTexture::render()
+void LTexture::render(SDL_Renderer* renderer)
 {
-    SDL_RenderCopy(gRenderer, this->mTexture, NULL, NULL);
+    SDL_RenderCopy(renderer, this->mTexture, NULL, NULL);
 }
 
-void LTexture::loadFromFile(std::string str)
+void LTexture::loadFromFile(std::string str, SDL_Renderer* renderer)
 {
     free();
     
@@ -63,7 +63,7 @@ void LTexture::loadFromFile(std::string str)
         printf("Surface could not be created! SDL Error: %s\n", SDL_GetError());
         throw "LTexture::loadFromFile surface loading failed!";
     }
-    SDL_Texture *lTexture = SDL_CreateTextureFromSurface(gRenderer, lSurface);
+    SDL_Texture *lTexture = SDL_CreateTextureFromSurface(renderer, lSurface);
     if (lTexture == NULL)
     {
         printf("Texture could not be created! SDL Error: %s\n", SDL_GetError());
@@ -95,7 +95,7 @@ void LTexture::setBlendMode(SDL_BlendMode blending)
     SDL_SetTextureBlendMode(this->mTexture, blending);
 }
 
-void LTexture::loadFromRenderedText(std::string text, SDL_Color textColor)
+void LTexture::loadFromRenderedText(std::string text, SDL_Color textColor, SDL_Renderer *renderer)
 {
     free();
     SDL_Surface *gSurface = TTF_RenderText_Solid(gFont, text.c_str(), textColor);
@@ -105,7 +105,7 @@ void LTexture::loadFromRenderedText(std::string text, SDL_Color textColor)
         throw "LTexture::loadFromRenderedText font loading failed!";
     }
 
-    mTexture = SDL_CreateTextureFromSurface(gRenderer, gSurface);
+    mTexture = SDL_CreateTextureFromSurface(renderer, gSurface);
     if (mTexture == NULL)
     {
         printf("Unable to render text texture! SDL_ttf Error: %s\n", TTF_GetError());
