@@ -1,5 +1,4 @@
 #include "include/LTexture.h"
-#include "include/global.h"
 #include "include/Utils.h"
 #include "include/models.h"
 #include "include/constants.h"
@@ -7,17 +6,16 @@
 #include <iostream>
 #include <exception>
 
-std::vector<SDL_Rect> gButtonOnSprite;
-std::vector<LButton> gButtons;
-
-LTexture gTexture;
 
 int main(int argc, char *argv[])
 {
     SDL_Renderer *renderer = NULL;
+    SDL_Window *window = NULL;
+    LTexture *texture = NULL;
+    std::vector<LTexture> kButtons(str.size());
     try
     {
-        Utils::init(renderer);
+        Utils::init(renderer, window);
         Dot dot(renderer);
         bool quit = true;
         SDL_Rect wall = {300, 40, 40, 400};
@@ -38,5 +36,5 @@ int main(int argc, char *argv[])
     {
         std::cout << "Exiting due to exception:\n\t" << e << std::endl;
     }
-    Utils::close(renderer);
+    Utils::close(renderer, window);
 }

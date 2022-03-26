@@ -7,7 +7,7 @@ public:
     LButton();
     void setPosition(int x, int y);
     void handleEvent(SDL_Event *e);
-    void render();
+    void render(LTexture *&, std::vector<SDL_Rect> &);
 
 private:
     SDL_Point mPosition;

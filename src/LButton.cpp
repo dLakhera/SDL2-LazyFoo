@@ -1,7 +1,6 @@
 #pragma once
 #include "include/LTexture.h"
 #include "include/LButton.h"
-#include "include/global.h"
 #include "include/models.h"
 #include "include/constants.h"
 
@@ -66,7 +65,7 @@ void LButton::handleEvent(SDL_Event *e)
     }
 }
 
-void LButton::render()
+void LButton::render(LTexture *&texture, std::vector<SDL_Rect> &buttonsOnSprite)
 {
-    gTexture.render(mPosition.x, mPosition.y, &gButtonOnSprite[mCurrentSprite]);
+    texture->render(mPosition.x, mPosition.y, &buttonsOnSprite[mCurrentSprite]);
 }

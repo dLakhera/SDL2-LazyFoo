@@ -1,13 +1,12 @@
 #include "include/Utils.h"
-#include "include/global.h"
+#include "include/LButton.h"
 #include "include/models.h"
 #include "include/constants.h"
 #include <iostream>
 
-SDL_Window *gWindow = NULL;
 std::vector<LTexture> gKButtons;
 
-void Utils::init(SDL_Renderer* &renderer)
+void Utils::init(SDL_Renderer* &renderer, SDL_Window* &window)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -16,15 +15,15 @@ void Utils::init(SDL_Renderer* &renderer)
     }
     else
     {
-        gWindow = SDL_CreateWindow("KMag", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-        if (gWindow == NULL)
+        window = SDL_CreateWindow("KMag", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        if (window == NULL)
         {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
             throw "Init failed()!";
         }
         else
         {
-            renderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+            renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
             if (renderer == NULL)
             {
                 printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
@@ -34,29 +33,40 @@ void Utils::init(SDL_Renderer* &renderer)
     }
 }
 
-void Utils::loadMedia(SDL_Renderer* renderer)
+void Utils::loadMedia(SDL_Renderer* renderer, std::vector<LTexture> &kButtons)
 {
-    gKButtons.clear();
-    gKButtons.resize(str.size(), LTexture());
+    kButtons.clear();
+    kButtons.resize(str.size(), LTexture());
 
     for (int i = 0; i < str.size(); i++)
     {
-        gKButtons[i].loadFromFile(str[i].c_str(), renderer);
+        kButtons[i].loadFromFile(str[i].c_str(), renderer);
     }
 }
 
-void Utils::loadMedia(const std::string str, LTexture &gTexture, SDL_Renderer *renderer)
+void Utils::loadMedia(const std::string str, LTexture* &texture, SDL_Renderer *renderer)
 {
-    gTexture.loadFromFile(str.c_str(), renderer);
+    texture->loadFromFile(str.c_str(), renderer);
 }
 
-void Utils::close(SDL_Renderer *renderer)
+void Utils::close(LTexture* &texture, SDL_Renderer* &renderer, SDL_Window* &window)
 {
-    gTexture.free();
+    texture->free();
 
     SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(gWindow);
-    gWindow = NULL;
+    SDL_DestroyWindow(window);
+    window = NULL;
+    renderer = NULL;
+
+    IMG_Quit();
+    SDL_Quit();
+}
+
+void Utils::close(SDL_Renderer *&renderer, SDL_Window *&window)
+{
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    window = NULL;
     renderer = NULL;
 
     IMG_Quit();
@@ -88,7 +98,7 @@ KButton Utils::handleEvent(/* SDL_Event *e */)
     return currentTexture;
 }
 
-void Utils::update(bool &quit, SDL_Renderer* renderer)
+void Utils::update(bool &quit, SDL_Renderer* &renderer, std::vector<LTexture> &kButtons)
 {
     SDL_Event e;
     KButton currentSprite = BUTTON_SPRITE_DEFAULT;
@@ -102,6 +112,6 @@ void Utils::update(bool &quit, SDL_Renderer* renderer)
     currentSprite = Utils::handleEvent();
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
-    gKButtons[currentSprite].render(renderer);
+    kButtons[currentSprite].render(renderer);
     SDL_RenderPresent(renderer);
 }

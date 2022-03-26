@@ -15,7 +15,7 @@ public:
     int getWidth();
     int getHeight();
     void loadFromFile(std::string, SDL_Renderer* renderer);
-    void loadFromRenderedText(std::string text, SDL_Color textColor, SDL_Renderer *renderer);
+    void loadFromRenderedText(std::string text, SDL_Color textColor, SDL_Renderer* &renderer, TTF_Font* &font);
     void setColor(Uint8 red, Uint8 green, Uint8 blue);
     void setBlendMode(SDL_BlendMode blending);
     void setAlpha(Uint8 alpha);

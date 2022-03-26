@@ -1,7 +1,6 @@
-#include "include/global.h"
+#include "include/LButton.h"
 #include <iostream>
 
-TTF_Font* gFont = NULL;
 LTexture::LTexture()
 {
     mTexture = NULL;
@@ -95,17 +94,17 @@ void LTexture::setBlendMode(SDL_BlendMode blending)
     SDL_SetTextureBlendMode(this->mTexture, blending);
 }
 
-void LTexture::loadFromRenderedText(std::string text, SDL_Color textColor, SDL_Renderer *renderer)
+void LTexture::loadFromRenderedText(std::string text, SDL_Color textColor, SDL_Renderer* &renderer, TTF_Font* &font)
 {
     free();
-    SDL_Surface *gSurface = TTF_RenderText_Solid(gFont, text.c_str(), textColor);
-    if (gSurface == NULL)
+    SDL_Surface *lSurface = TTF_RenderText_Solid(font, text.c_str(), textColor);
+    if (lSurface == NULL)
     {
         printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
         throw "LTexture::loadFromRenderedText font loading failed!";
     }
 
-    mTexture = SDL_CreateTextureFromSurface(renderer, gSurface);
+    mTexture = SDL_CreateTextureFromSurface(renderer, lSurface);
     if (mTexture == NULL)
     {
         printf("Unable to render text texture! SDL_ttf Error: %s\n", TTF_GetError());
@@ -113,10 +112,10 @@ void LTexture::loadFromRenderedText(std::string text, SDL_Color textColor, SDL_R
     }
     else
     {
-        mWidth = gSurface->w;
-        mHeight = gSurface->h;
+        mWidth = lSurface->w;
+        mHeight = lSurface->h;
     }
-    SDL_FreeSurface(gSurface);
+    SDL_FreeSurface(lSurface);
 }
 
 void LTexture::print() {
