@@ -43,12 +43,11 @@ void Dot::handleEvent(SDL_Event &e)
     }
 }
 
-void Dot::move(Uint32 lastFrameTicks)
+void Dot::move()
 {
-    mPosX += mDirX * DOT_VEL * (SDL_GetTicks() - lastFrameTicks);
-    mPosY += mDirY * DOT_VEL * (SDL_GetTicks() - lastFrameTicks);
+    mPosX += mDirX * DOT_VEL;
+    mPosY += mDirY * DOT_VEL;
     windowing();
-    lastFrameTicks = SDL_GetTicks();
 }
 
 void Dot::render(SDL_Renderer* &renderer)
@@ -77,7 +76,7 @@ void Dot::windowing()
     }
 }
 
-void Dot::update(Uint32 lastFrameTicks, bool &quit)
+void Dot::update(bool &quit)
 {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0)
@@ -88,5 +87,5 @@ void Dot::update(Uint32 lastFrameTicks, bool &quit)
         }
     }
     handleEvent(e);
-    move(lastFrameTicks);
+    move();
 }

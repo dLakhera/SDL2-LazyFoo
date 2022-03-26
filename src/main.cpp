@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
         {
             SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
             SDL_RenderClear(renderer);
-            dot.update(SDL_GetTicks(), quit);
+            dot.update(quit);
             dot.render(renderer);
             SDL_RenderPresent(renderer);
         }

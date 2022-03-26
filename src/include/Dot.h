@@ -10,10 +10,10 @@ public:
     Dot(SDL_Renderer* &);
 
     void handleEvent(SDL_Event &e);
-    void move(Uint32);
+    void move();
     void render(SDL_Renderer* &);
     void windowing();
-    void update(Uint32 , bool&);
+    void update(bool&);
 
 private:
     SDL_Texture* mTexture;
