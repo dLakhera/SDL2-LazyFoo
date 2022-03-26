@@ -17,6 +17,8 @@ Dot::Dot(SDL_Renderer* &renderer)
     }
     mPosX = DOT_WIDTH / 2;
     mPosY = DOT_HEIGHT / 2;
+    mCollider = {mPosX,mPosY, lSurface->w, lSurface->h};
+    SDL_FreeSurface(lSurface);
 }
 
 void Dot::handleEvent(SDL_Event &e)
@@ -43,10 +45,18 @@ void Dot::handleEvent(SDL_Event &e)
     }
 }
 
-void Dot::move()
+void Dot::move(SDL_Rect &wall)
 {
     mPosX += mDirX * DOT_VEL;
     mPosY += mDirY * DOT_VEL;
+    mCollider.x = mPosX;
+    mCollider.y = mPosY;
+    if(checkCollision(wall)){
+        mPosX -= mDirX * DOT_VEL;
+        mCollider.x = mPosX;
+        mPosY -= mDirY * DOT_VEL;
+        mCollider.y = mPosY;
+    }
     windowing();
 }
 
@@ -60,7 +70,7 @@ void Dot::windowing()
 {
     if (mPosX > SCREEN_WIDTH)
     {
-        mPosX = SCREEN_WIDTH - DOT_WIDTH / 2;
+        mPosX = SCREEN_WIDTH - DOT_WIDTH;
     }
     else if (mPosX < 0)
     {
@@ -68,7 +78,7 @@ void Dot::windowing()
     }
     if (mPosY > SCREEN_HEIGHT)
     {
-        mPosY = SCREEN_HEIGHT - DOT_HEIGHT / 2;
+        mPosY = SCREEN_HEIGHT - DOT_HEIGHT;
     }
     else if (mPosY < 0)
     {
@@ -76,7 +86,7 @@ void Dot::windowing()
     }
 }
 
-void Dot::update(bool &quit)
+void Dot::update(bool &quit, SDL_Rect &wall)
 {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0)
@@ -87,5 +97,40 @@ void Dot::update(bool &quit)
         }
     }
     handleEvent(e);
-    move();
+    move(wall);
+}
+
+bool Dot::checkCollision(SDL_Rect &wall)
+{
+    int topWall = wall.y;
+    int bottomWall = wall.y + wall.h;
+    int leftWall = wall.x;
+    int rightWall = wall.x + wall.w;
+
+    int topDot = mCollider.y;
+    int bottomDot = mCollider.y + mCollider.h;
+    int leftDot = mCollider.x;
+    int rightDot = mCollider.x + mCollider.w;
+
+    if (bottomWall <= topDot)
+    {
+        return false;
+    }
+
+    if (topWall >= bottomDot)
+    {
+        return false;
+    }
+
+    if (rightWall <= leftDot)
+    {
+        return false;
+    }
+
+    if (leftWall >= rightDot)
+    {
+        return false;
+    }
+
+    return true;
 }

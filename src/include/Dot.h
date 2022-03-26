@@ -10,13 +10,14 @@ public:
     Dot(SDL_Renderer* &);
 
     void handleEvent(SDL_Event &e);
-    void move();
+    void move(SDL_Rect &);
     void render(SDL_Renderer* &);
     void windowing();
-    void update(bool&);
-
+    void update(bool&, SDL_Rect&);
+    bool checkCollision(SDL_Rect& );
 private:
     SDL_Texture* mTexture;
     int mPosX, mPosY;
     int mDirX, mDirY;
+    SDL_Rect mCollider;
 };
