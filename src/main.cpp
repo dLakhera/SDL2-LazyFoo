@@ -6,35 +6,53 @@
 #include <iostream>
 #include <exception>
 
-void handleCamera(SDL_Rect&, Dot&);
+void handleCamera(SDL_Rect &, Dot &);
 
 int main(int argc, char *argv[])
 {
     SDL_Renderer *renderer = NULL;
     SDL_Window *window = NULL;
+    TTF_Font *gFont = NULL;
     try
     {
-        Utils::init(renderer, window);
-        Dot dot(renderer);
         bool quit = true;
+
+        Utils::init(renderer, window, gFont);
+        SDL_StartTextInput();
+
         LTexture gBGTexture;
+        LTexture gInputTextTexture;
+        LTexture gPromptText;
+
+        SDL_Color color = {0, 0, 0, 0xFF};
+        std::string inputText = "Some Text";
+
         gBGTexture.loadFromFile("/Users/droidlakhera/Desktop/Projects/sdl2/kMag/res/img/mario-bg.png", renderer);
-        int scrollingOffset = 0;
+        gInputTextTexture.loadFromRenderedText(inputText, color, renderer, gFont);
+        gPromptText.loadFromRenderedText("Enter Text: ", color, renderer, gFont);
         while (quit)
         {
+            bool renderText = false;
             SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
             SDL_RenderClear(renderer);
-            --scrollingOffset;
-            if (scrollingOffset < -gBGTexture.getWidth())
+            gBGTexture.render(0, 0, NULL, renderer);
+            Utils::update(quit, renderer, renderText, inputText);
+            if (renderText)
             {
-                scrollingOffset = 0;
+                if (inputText != "")
+                {
+                    gInputTextTexture.loadFromRenderedText(inputText.c_str(), color, renderer, gFont);
+                }
+                else
+                {
+                    gInputTextTexture.loadFromRenderedText(" ", color, renderer, gFont);
+                }
             }
-            gBGTexture.render(scrollingOffset, 0, NULL, renderer);
-            gBGTexture.render(scrollingOffset + gBGTexture.getWidth(), 0, NULL, renderer);
-            dot.update(quit);
-            dot.render(renderer);
+            gPromptText.render((SCREEN_WIDTH - gPromptText.getWidth()) / 2, 0, NULL, renderer);
+            gInputTextTexture.render((SCREEN_WIDTH - gInputTextTexture.getWidth()) / 2, gPromptText.getHeight(), NULL, renderer);
             SDL_RenderPresent(renderer);
         }
+        SDL_StopTextInput();
     }
     catch (const char *e)
     {

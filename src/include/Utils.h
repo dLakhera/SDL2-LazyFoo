@@ -4,11 +4,12 @@
 
 namespace Utils
 {
-    void init(SDL_Renderer* &, SDL_Window* &);
+    void init(SDL_Renderer* &, SDL_Window* &, TTF_Font* &);
     void loadMedia(const std::string str, LTexture* &texture, SDL_Renderer *renderer);
     void loadMedia(SDL_Renderer *renderer, std::vector<LTexture> &);
     void close(SDL_Renderer *&, SDL_Window *&);
     void close(LTexture *&, SDL_Renderer *&, SDL_Window *&);
-    void update(bool &, SDL_Renderer* &, std::vector<LTexture> &);
+    void update(bool &, SDL_Renderer *&, std::vector<LTexture> &);
+    void update(bool &, SDL_Renderer *&, bool&, std::string&);
     KButton handleEvent();
 }

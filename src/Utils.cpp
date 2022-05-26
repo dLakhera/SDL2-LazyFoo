@@ -6,9 +6,9 @@
 
 std::vector<LTexture> gKButtons;
 
-void Utils::init(SDL_Renderer* &renderer, SDL_Window* &window)
+void Utils::init(SDL_Renderer *&renderer, SDL_Window *&window, TTF_Font *&gFont)
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO) < 0 or TTF_Init() < 0)
     {
         printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
         throw "Init failed()!";
@@ -30,10 +30,17 @@ void Utils::init(SDL_Renderer* &renderer, SDL_Window* &window)
                 throw "Init failed()!";
             }
         }
+
+        gFont = TTF_OpenFont("/Users/droidlakhera/Desktop/Projects/sdl2/kMag/res/fonts/lazy.ttf", 28);
+        if (gFont == NULL)
+        {
+            printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+            throw "Init failed()!";
+        }
     }
 }
 
-void Utils::loadMedia(SDL_Renderer* renderer, std::vector<LTexture> &kButtons)
+void Utils::loadMedia(SDL_Renderer *renderer, std::vector<LTexture> &kButtons)
 {
     kButtons.clear();
     kButtons.resize(str.size(), LTexture());
@@ -44,12 +51,12 @@ void Utils::loadMedia(SDL_Renderer* renderer, std::vector<LTexture> &kButtons)
     }
 }
 
-void Utils::loadMedia(const std::string str, LTexture* &texture, SDL_Renderer *renderer)
+void Utils::loadMedia(const std::string str, LTexture *&texture, SDL_Renderer *renderer)
 {
     texture->loadFromFile(str.c_str(), renderer);
 }
 
-void Utils::close(LTexture* &texture, SDL_Renderer* &renderer, SDL_Window* &window)
+void Utils::close(LTexture *&texture, SDL_Renderer *&renderer, SDL_Window *&window)
 {
     texture->free();
 
@@ -98,7 +105,7 @@ KButton Utils::handleEvent(/* SDL_Event *e */)
     return currentTexture;
 }
 
-void Utils::update(bool &quit, SDL_Renderer* &renderer, std::vector<LTexture> &kButtons)
+void Utils::update(bool &quit, SDL_Renderer *&renderer, std::vector<LTexture> &kButtons)
 {
     SDL_Event e;
     KButton currentSprite = BUTTON_SPRITE_DEFAULT;
@@ -114,4 +121,40 @@ void Utils::update(bool &quit, SDL_Renderer* &renderer, std::vector<LTexture> &k
     SDL_RenderClear(renderer);
     kButtons[currentSprite].render(renderer);
     SDL_RenderPresent(renderer);
+}
+void Utils::update(bool & quit, SDL_Renderer *& renderer, bool& renderText, std::string &inputText)
+{
+    SDL_Event e;
+    while (SDL_PollEvent(&e) != 0)
+    {
+        if (e.type == SDL_QUIT)
+        {
+            quit = false;
+        }
+        else if (e.type == SDL_KEYDOWN)
+        {
+            if (e.key.keysym.sym == SDLK_BACKSPACE && inputText.length() > 0)
+            {
+                inputText.pop_back();
+                renderText = true;
+            }
+            else if (e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL)
+            {
+                SDL_SetClipboardText(inputText.c_str());
+            }
+            else if (e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL)
+            {
+                inputText = SDL_GetClipboardText();
+                renderText = true;
+            }
+        }
+        else if (e.type == SDL_TEXTINPUT)
+        {
+            if (!(SDL_GetModState() & KMOD_CTRL && (e.text.text[0] == 'c' || e.text.text[0] == 'C' || e.text.text[0] == 'v' || e.text.text[0] == 'V')))
+            {
+                inputText += e.text.text;
+                renderText = true;
+            }
+        }
+    }
 }
