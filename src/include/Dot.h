@@ -10,11 +10,14 @@ public:
     Dot(SDL_Renderer* &);
 
     void handleEvent(SDL_Event &e);
-    void move(SDL_Rect &);
-    void render(SDL_Renderer* &);
+    void move();
+    void render(SDL_Renderer *&);
+    void render(SDL_Renderer *&, SDL_Rect& camera);
     void windowing();
-    void update(bool&, SDL_Rect&);
+    void update(bool&);
     bool checkCollision(SDL_Rect& );
+    int getPosX();
+    int getPosY();
 private:
     SDL_Texture* mTexture;
     int mPosX, mPosY;

@@ -45,40 +45,32 @@ void Dot::handleEvent(SDL_Event &e)
     }
 }
 
-void Dot::move(SDL_Rect &wall)
+void Dot::move()
 {
     mPosX += mDirX * DOT_VEL;
     mPosY += mDirY * DOT_VEL;
-    mCollider.x = mPosX;
-    mCollider.y = mPosY;
-    if(checkCollision(wall)){
-        mPosX -= mDirX * DOT_VEL;
-        mCollider.x = mPosX;
-        mPosY -= mDirY * DOT_VEL;
-        mCollider.y = mPosY;
-    }
     windowing();
 }
 
-void Dot::render(SDL_Renderer* &renderer)
+void Dot::render(SDL_Renderer* &renderer, SDL_Rect& camera)
 {
-    SDL_Rect renderQuad = {mPosX, mPosY, DOT_WIDTH, DOT_HEIGHT};
+    SDL_Rect renderQuad = {mPosX-camera.x, mPosY-camera.y, DOT_WIDTH, DOT_HEIGHT};
     SDL_RenderCopy(renderer, mTexture, NULL, &renderQuad);
 }
 
 void Dot::windowing()
 {
-    if (mPosX > SCREEN_WIDTH)
+    if (mPosX + DOT_WIDTH > LEVEL_WIDTH)
     {
-        mPosX = SCREEN_WIDTH - DOT_WIDTH;
+        mPosX = LEVEL_WIDTH - DOT_WIDTH;
     }
     else if (mPosX < 0)
     {
         mPosX = DOT_WIDTH / 2;
     }
-    if (mPosY > SCREEN_HEIGHT)
+    if (mPosY + DOT_HEIGHT > LEVEL_HEIGHT)
     {
-        mPosY = SCREEN_HEIGHT - DOT_HEIGHT;
+        mPosY = LEVEL_HEIGHT - DOT_HEIGHT;
     }
     else if (mPosY < 0)
     {
@@ -86,7 +78,7 @@ void Dot::windowing()
     }
 }
 
-void Dot::update(bool &quit, SDL_Rect &wall)
+void Dot::update(bool &quit)
 {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0)
@@ -97,7 +89,7 @@ void Dot::update(bool &quit, SDL_Rect &wall)
         }
     }
     handleEvent(e);
-    move(wall);
+    move();
 }
 
 bool Dot::checkCollision(SDL_Rect &wall)
@@ -133,4 +125,14 @@ bool Dot::checkCollision(SDL_Rect &wall)
     }
 
     return true;
+}
+
+int Dot::getPosX()
+{
+    return mPosX;
+}
+
+int Dot::getPosY()
+{
+    return mPosY;
 }
