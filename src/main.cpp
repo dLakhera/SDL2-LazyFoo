@@ -12,22 +12,27 @@ int main(int argc, char *argv[])
 {
     SDL_Renderer *renderer = NULL;
     SDL_Window *window = NULL;
-    SDL_Rect camera = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
     try
     {
         Utils::init(renderer, window);
         Dot dot(renderer);
         bool quit = true;
         LTexture gBGTexture;
-        gBGTexture.loadFromFile("/Users/droidlakhera/Desktop/Projects/sdl2/kMag/res/img/bg.png", renderer);
+        gBGTexture.loadFromFile("/Users/droidlakhera/Desktop/Projects/sdl2/kMag/res/img/mario-bg.png", renderer);
+        int scrollingOffset = 0;
         while (quit)
         {
             SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
             SDL_RenderClear(renderer);
-            gBGTexture.render(0, 0, &camera, renderer);
-            handleCamera(camera, dot);
+            --scrollingOffset;
+            if (scrollingOffset < -gBGTexture.getWidth())
+            {
+                scrollingOffset = 0;
+            }
+            gBGTexture.render(scrollingOffset, 0, NULL, renderer);
+            gBGTexture.render(scrollingOffset + gBGTexture.getWidth(), 0, NULL, renderer);
             dot.update(quit);
-            dot.render(renderer, camera);
+            dot.render(renderer);
             SDL_RenderPresent(renderer);
         }
     }
@@ -36,26 +41,4 @@ int main(int argc, char *argv[])
         std::cout << "Exiting due to exception:\n\t" << e << std::endl;
     }
     Utils::close(renderer, window);
-}
-
-void handleCamera(SDL_Rect& camera, Dot &dot){
-    camera.x = (dot.getPosX() + Dot::DOT_WIDTH / 2) - SCREEN_WIDTH / 2;
-    camera.y = (dot.getPosY() + Dot::DOT_HEIGHT / 2) - SCREEN_HEIGHT / 2;
-
-    if (camera.x < 0)
-    {
-        camera.x = 0;
-    }
-    if (camera.y < 0)
-    {
-        camera.y = 0;
-    }
-    if (camera.x > LEVEL_WIDTH - camera.w)
-    {
-        camera.x = LEVEL_WIDTH - camera.w;
-    }
-    if (camera.y > LEVEL_HEIGHT - camera.h)
-    {
-        camera.y = LEVEL_HEIGHT - camera.h;
-    }
 }

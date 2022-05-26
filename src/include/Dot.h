@@ -12,7 +12,6 @@ public:
     void handleEvent(SDL_Event &e);
     void move();
     void render(SDL_Renderer *&);
-    void render(SDL_Renderer *&, SDL_Rect& camera);
     void windowing();
     void update(bool&);
     bool checkCollision(SDL_Rect& );

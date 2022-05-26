@@ -52,25 +52,25 @@ void Dot::move()
     windowing();
 }
 
-void Dot::render(SDL_Renderer* &renderer, SDL_Rect& camera)
+void Dot::render(SDL_Renderer* &renderer)
 {
-    SDL_Rect renderQuad = {mPosX-camera.x, mPosY-camera.y, DOT_WIDTH, DOT_HEIGHT};
+    SDL_Rect renderQuad = {mPosX, mPosY, DOT_WIDTH, DOT_HEIGHT};
     SDL_RenderCopy(renderer, mTexture, NULL, &renderQuad);
 }
 
 void Dot::windowing()
 {
-    if (mPosX + DOT_WIDTH > LEVEL_WIDTH)
+    if (mPosX > SCREEN_WIDTH)
     {
-        mPosX = LEVEL_WIDTH - DOT_WIDTH;
+        mPosX = SCREEN_WIDTH - DOT_WIDTH / 2;
     }
     else if (mPosX < 0)
     {
         mPosX = DOT_WIDTH / 2;
     }
-    if (mPosY + DOT_HEIGHT > LEVEL_HEIGHT)
+    if (mPosY > SCREEN_HEIGHT)
     {
-        mPosY = LEVEL_HEIGHT - DOT_HEIGHT;
+        mPosY = SCREEN_HEIGHT - DOT_HEIGHT / 2;
     }
     else if (mPosY < 0)
     {
